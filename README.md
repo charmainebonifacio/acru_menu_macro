@@ -2,6 +2,8 @@
 
 This macro saves the latest calibrated variables into a text file. The adjusted variables will be saved as MENU_PARAM.txt. This file is required for the [ACRU MENU PARAMETERIZATION program](https://github.com/charmainebonifacio/acru_menu) to run.
 
+![GUI](https://farm1.staticflickr.com/344/19874952454_ae66869f27_z.jpg)
+
 ## Context
 The purpose is to automate the ACRU calibration workflow by efficiently making notes on the calibration process for the ACRU MODEL. Since only one variable can be calibrated at a time, the procedure will require the creation of multiple MENU parameter files. The calibration of 23 variables requires a lot of documentation. The logfile for the macro will ensure that all user calibration summary will be documented each time the variables are adjusted.
 
