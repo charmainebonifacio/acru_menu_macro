@@ -23,13 +23,14 @@ Function ACRU_MENU_MAIN()
     Dim ProcessingTime As Long
     Dim MessageSummary As String, SummaryTitle As String
     Dim logfilename As String, logtextfile As String, logext As String
+    
     Dim UserSelectedFolder As String
     Dim MAINFolder As String, MAINOUT As String
     Dim SavedFileStatus As Boolean
     Dim ParameterizationStatus As Boolean
     
     ' Initialize Variables
-    SummaryTitle = "Zonal Statistics Macro Diagnostic Summary"
+    SummaryTitle = "Tool Summary"
     
     ' Disable all the pop-up menus
     Application.ScreenUpdating = False
@@ -57,29 +58,23 @@ Function ACRU_MENU_MAIN()
     Set objFSOlog = CreateObject("Scripting.FileSystemObject")
     Set logfile = objFSOlog.CreateTextFile(logtextfile, True)
     
-    ' Maintain log starting from here
-    logfile.WriteLine "[ START MACRO ] "
+    '---------------------------------------------------------------------
+    ' III. START PROGRAM
+    '---------------------------------------------------------------------
+    start_time = Now()
+    logfile.WriteLine "[ START PROGRAM ] "
     logfile.WriteLine " "
     logfile.WriteLine "[ CALIBRATION SUMMARY] "
     logfile.WriteLine UserForm1.TextBox1.Value
     logfile.WriteLine " "
-    logfile.WriteLine "Selected directory: " & UserSelectedFolder
-    
-    '---------------------------------------------------------------------
-    ' III. START PROGRAM
-    '---------------------------------------------------------------------
-    Call WarningMessage
-    start_time = Now()
+    logfile.WriteLine "User selected the following directory : " & UserSelectedFolder
     logfile.WriteLine "[ PROCESSING FILE SUMMARY ]"
     SavedFileStatus = PROCESSFILE(UserSelectedFolder)
     If SavedFileStatus = False Then GoTo Cancel
     logfile.WriteLine " "
     logfile.WriteLine "[ MENU PARAMETERIZATION SUMMARY ]"
     ParameterizationStatus = MENU_PARAMETERIZATION(UserSelectedFolder)
-    If SavedFileStatus = False Then
-        logfile.WriteLine "Could not successfully parameterize the MENU FILE. "
-        logfile.WriteLine "Please check the log files. "
-    End If
+    If ParameterizationStatus = False Then GoTo Cancel
     
     '---------------------------------------------------------------------
     ' IV. END PROGRAM
@@ -87,6 +82,7 @@ Function ACRU_MENU_MAIN()
     end_time = Now()
     ProcessingTime = DateDiff("s", CDate(start_time), CDate(end_time))
     MessageSummary = MacroTimer(ProcessingTime)
+    MsgBox MessageSummary, vbOKOnly, SummaryTitle
     logfile.WriteLine " "
     logfile.WriteLine MessageSummary
     
@@ -98,14 +94,21 @@ Cancel:
         end_time = Now()
         ProcessingTime = DateDiff("s", CDate(start_time), CDate(end_time))
         MessageSummary = MacroTimer(ProcessingTime)
-        logfile.WriteLine "Could not file the right worksheet. No text file was saved."
+        logfile.WriteLine "Unable to find the right worksheet. No text file was saved."
     End If
-    
-    logfile.WriteLine " "
-    logfile.WriteLine "[ END PROGRAM ] "
+    If ParameterizationStatus = False Then
+        end_time = Now()
+        ProcessingTime = DateDiff("s", CDate(start_time), CDate(end_time))
+        MessageSummary = MacroTimer(ProcessingTime)
+        logfile.WriteLine "Unable to successfully parameterize the MENU FILE. "
+        logfile.WriteLine "Please check the log files. "
+    End If
 
     ' Close Log File
+    logfile.WriteLine " "
+    logfile.WriteLine "[ END PROGRAM ] "
     logfile.Close
     Set logfile = Nothing
     Set objFSOlog = Nothing
 End Function
+
